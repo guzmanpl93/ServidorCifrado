@@ -1,0 +1,101 @@
+La idea general es:
+
+El cliente envía una petición al servidor.
+La petición contiene: 
+	un código de operación (200)
+	el nombre del algoritmo hash
+	los bytes sobre los que calcular el hash
+
+El servidor procesa la petición.
+El servidor devuelve:
+	éxito (0) + el hash en Base64
+	error (-1) + un código de error concreto
+
+Qué significa cada parte
+1. Código de petición
+
+Lo primero que se envía es un entero con valor 200.
+
+2. Nombre del algoritmo
+
+Después del 200 se envía:
+
+“una cadena con el nombre de un algoritmo de resumen”
+
+Es decir, un texto como:
+
+"SHA-256"
+"MD5"
+"SHA-1"
+
+El servidor debe: leer esa cadena, comprobar que realmente es una cadena válida y comprobar que el algoritmo existe
+
+3. Secuencia de bytes
+
+Después del nombre del algoritmo se envían los datos.
+
+“una secuencia de bytes de longitud arbitraria”
+
+Eso significa:
+
+puede tener cualquier tamaño
+no es texto necesariamente
+el servidor debe leer exactamente esos bytes
+
+Normalmente hay que enviar:
+
+primero la longitud
+luego los bytes
+
+Qué debe hacer el servidor
+
+Cuando recibe todo correctamente:
+
+	calcula el hash con el algoritmo indicado
+	obtiene el resumen binario
+	lo convierte a Base64
+	responde con: 0
+	la cadena Base64
+
+No hay que desencriptar nada.
+
+Un hash:
+
+transforma datos en un resumen fijo
+es unidireccional
+ejemplos:
+SHA-256
+MD5
+
+El ejercicio también evalúa cómo manejas fallos del protocolo.
+
+Error 201
+
+“timeout al leer el nombre del algoritmo”
+
+Debes detectar un timeout durante esa lectura.
+
+Error 202
+
+“el dato recibido como nombre del algoritmo no es una cadena”
+
+el cliente envió algo mal formateado
+el servidor esperaba una cadena
+pero recibió otro tipo de dato o datos corruptos
+Error 203
+
+“el nombre del algoritmo no es válido”
+
+La cadena sí llegó bien, pero:
+
+el algoritmo no existe
+o no está soportado
+
+Ejemplo:
+
+"SHA-999"
+Error 204
+
+“timeout al leer la secuencia de bytes”
+
+El problema ocurre mientras llegan los datos sobre los que calcular el hash.
