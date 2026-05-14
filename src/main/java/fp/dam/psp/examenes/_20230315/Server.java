@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
 
 public class Server {
 	public static void main(String[] args) throws IOException {
-		try (ServerSocket serverSocket = new ServerSocket(9001)){
+		try (ServerSocket serverSocket = new ServerSocket(9000)){
 			//Este es el HOST, el servidor
-			System.out.println("Servidor ECHO escuchando en el puerto 9001");
+			System.out.println("Servidor ECHO escuchando en el puerto 9000");
 			
 			//Limite de threads
 			ExecutorService service = Executors.newFixedThreadPool(20);
@@ -23,6 +23,6 @@ public class Server {
 			//Podemos utillizar el socket para comunicar con el cliente
 				service.submit(new ServiceTask(socket)::run);
 			}
-		}
+		} 
 	}
 }
