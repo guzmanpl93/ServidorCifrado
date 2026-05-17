@@ -1,13 +1,9 @@
 package fp.dam.psp.examenes._20230315;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.*;
 
 public class ServiceTask {
@@ -15,45 +11,50 @@ public class ServiceTask {
 	private final Socket socket;
 	DataInputStream in;
 	DataOutputStream out;
-	
+
 	public ServiceTask(Socket socket) {
 		this.socket = socket;
 	}
-	
+
 	public void run() {
 		try (socket){
+			
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
+			socket.setSoTimeout(2000);
 			String linea;
-			while ((linea = in.readUTF()) !=null) {
-				if (linea.matches(Integer.toString(200))) {
-					String val1 = hashMethod(in.readUTF());
-					String val2 = in.readUTF();
-					if (Boolean.parseBoolean(val2))
-						out.writeUTF("203");
-				} else if (linea.matches(Integer.toString(300))) {
+			
+			try {
+				while (true) {
+					linea = in.readUTF();
 					
-				} else if (linea.matches(Integer.toString(400))) {
-					
-				} else {
-					if (linea.isEmpty()) {
-						out.writeUTF("10002");
+					if (linea.matches("hash")) {
+						
+					} else if (linea.matches("cert")) {
+						
+					} else if (linea.matches("cifrar")) {
+						
 					} else {
-						out.writeUTF("10003");
+						out.writeUTF("ERROR:'abcd' no se reconoce como una petición válida");
+						out.flush();
 					}
 				}
-				out.writeChars(linea);;
+			} catch (SocketTimeoutException e) {
+				out.writeUTF("ERROR:timeout leyendo petición");
+				out.flush();
+			} catch (EOFException e) {
+				out.writeUTF("ERROR:EOF leyendo petición");
 				out.flush();
 			}
 			
-		} catch (SocketTimeoutException e) {
-			out.writeUTF("ERROR:timeout leyendo petición");
-		} 
-		System.out.println(socket.getRemoteSocketAddress() + ": Conexión terminada");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	private String hashMethod(String recibo) {
-		for (String s: new String []{"SHA-256", "MD5", "SHA3-512"})
+		for (String s : new String[] { "SHA-256", "MD5", "SHA3-512" })
 			if (recibo.matches(s)) {
 				return "true";
 			}
