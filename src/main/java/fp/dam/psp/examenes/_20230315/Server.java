@@ -15,6 +15,7 @@ public class Server {
 			//Limite de threads
 			ExecutorService service = Executors.newFixedThreadPool(20);
 			
+			long inicio = System.currentTimeMillis();
 			//El socket debería estar dentro de un bucle que se pueda detener
 			while (true) {
 			//Para aceptar conexiones, usar socket.accept()
